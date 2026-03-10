@@ -1,0 +1,46 @@
+# ===== Go =====
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+*.test
+*.out
+
+# ===== Build output =====
+/bin/
+/build/
+/dist/
+/tmp/
+/app
+
+# ===== Go workspace =====
+go.work
+go.work.sum
+
+# ===== Vendor (ถ้าไม่ commit) =====
+/vendor/
+
+# ===== Air =====
+.air.toml
+tmp/
+
+# ===== Environment =====
+.env
+.env.*
+!.env.example
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Logs =====
+*.log
+
+# ===== Coverage =====
+coverage.out
