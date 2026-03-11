@@ -57,7 +57,7 @@ func (u *useCase) Register(dto *RegisterDTO) (*AuthResponse, error) {
 	}
 
 	// Hash and store refresh token
-	refreshHash, err := common.HashPassword(refreshToken)
+	refreshHash, err := common.HashToken(refreshToken)
 	if err != nil {
 		return nil, errors.New("failed to hash refresh token")
 	}
@@ -155,7 +155,7 @@ func (u *useCase) RefreshToken(dto *RefreshTokenDTO) (*AuthResponse, error) {
 	}
 
 	// Hash and store new refresh token
-	refreshHash, err := common.HashPassword(refreshToken)
+	refreshHash, err := common.HashToken(refreshToken)
 	if err != nil {
 		return nil, errors.New("failed to hash refresh token")
 	}
