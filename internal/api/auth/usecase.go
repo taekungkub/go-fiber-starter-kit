@@ -2,7 +2,6 @@ package auth
 
 import (
 	"errors"
-	"fmt"
 	"go-fiber-stater-kit/pkg/common"
 	"go-fiber-stater-kit/pkg/core"
 )
@@ -99,8 +98,6 @@ func (u *useCase) Login(dto *LoginDTO) (*AuthResponse, error) {
 	if err != nil {
 		return nil, errors.New("failed to generate tokens")
 	}
-
-	fmt.Println(len(refreshToken))
 
 	// Hash and store refresh token
 	refreshHash, err := common.HashToken(refreshToken)

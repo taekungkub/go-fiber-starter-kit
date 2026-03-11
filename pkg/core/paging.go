@@ -1,7 +1,6 @@
 package core
 
 import (
-	"fmt"
 	"math"
 )
 
@@ -20,7 +19,6 @@ func Offset(pageNo int64, limitNo int64) int64 {
 }
 
 func Pagination(pageNo int64, limitNo int64, getCount func() int64, getData func(limit int64, offset int64) interface{}) Paging {
-	fmt.Println("2 Pagination")
 	total := getCount()
 	var pageCount = math.Ceil(float64(total) / float64(limitNo))
 	pageCountInt := int64(pageCount)
