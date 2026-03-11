@@ -49,6 +49,7 @@ func (r *repository) FindAll(limit, offset int64, sort, order string) ([]User, e
 	if users == nil {
 		users = []User{}
 	}
+
 	return users, nil
 }
 

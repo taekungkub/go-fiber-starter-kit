@@ -1,13 +1,12 @@
 package core
 
 import (
-	"fmt"
-	"github.com/gofiber/fiber/v2"
 	"strconv"
+
+	"github.com/gofiber/fiber/v2"
 )
 
 func PagingRequest(c *fiber.Ctx, limit int) (int64, int64) {
-	fmt.Println("1 PagingRequest")
 	page := 1
 	if limit == 0 {
 		limit = PagingLimitDefault

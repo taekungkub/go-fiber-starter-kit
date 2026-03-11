@@ -8,13 +8,11 @@ import (
 const PagingLimitDefault = 20
 
 type Paging struct {
-	List  interface{} `json:"list"`
-	Page  int64       `json:"page"`
-	Limit int64       `json:"limit"`
-	Count int64       `json:"count"`
-	Total int64       `json:"total"`
-	Start int64       `json:"start"`
-	End   int64       `json:"end"`
+	List      interface{} `json:"list"`
+	Page      int64       `json:"page"`
+	Limit     int64       `json:"limit"`
+	TotalPage int64       `json:"total_page"`
+	Total     int64       `json:"total"`
 }
 
 func Offset(pageNo int64, limitNo int64) int64 {
@@ -30,18 +28,14 @@ func Pagination(pageNo int64, limitNo int64, getCount func() int64, getData func
 		pageNo = 1
 	}
 	offset := (limitNo * pageNo) - limitNo
-	var startRow = (pageNo - 1) * limitNo
-	var endRow = startRow + limitNo - 1
 
 	data := getData(limitNo, offset)
 
 	return Paging{
-		List:  data,
-		Page:  pageNo,
-		Limit: limitNo,
-		Count: pageCountInt,
-		Total: total,
-		Start: startRow,
-		End:   endRow,
+		List:      data,
+		Page:      pageNo,
+		Limit:     limitNo,
+		TotalPage: pageCountInt,
+		Total:     total,
 	}
 }

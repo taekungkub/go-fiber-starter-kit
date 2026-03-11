@@ -51,13 +51,11 @@ func (u *useCase) FindAll(page, limit int64, sort, order string) (*core.Paging, 
 	if limit <= 0 {
 		// No pagination — return all with count
 		paging := core.Paging{
-			List:  responses,
-			Page:  1,
-			Limit: count,
-			Count: 1,
-			Total: count,
-			Start: 0,
-			End:   count - 1,
+			List:      responses,
+			Page:      1,
+			Limit:     count,
+			TotalPage: 1,
+			Total:     count,
 		}
 		return &paging, nil
 	}

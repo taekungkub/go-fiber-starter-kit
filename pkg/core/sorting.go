@@ -14,8 +14,8 @@ type Sorting struct {
 // SortingRequest parses sort and order query params with validation
 // Example: ?sort=created_at&order=asc
 func SortingRequest(c *fiber.Ctx, defaultSort string, defaultOrder string) Sorting {
-	sort := strings.TrimSpace(c.Query("sort"))
-	order := strings.ToUpper(strings.TrimSpace(c.Query("order")))
+	sort := strings.TrimSpace(c.Query("sort", defaultSort))
+	order := strings.ToUpper(strings.TrimSpace(c.Query("order", defaultOrder)))
 
 	// Validate sort field against whitelist
 
