@@ -6,6 +6,10 @@ import (
 	"go-fiber-stater-kit/internal/api/auth"
 	"go-fiber-stater-kit/internal/api/user"
 	"go-fiber-stater-kit/internal/database"
+	"go-fiber-stater-kit/internal/ingest"
+	"go-fiber-stater-kit/internal/queue"
+	"go-fiber-stater-kit/internal/worker"
+	"go-fiber-stater-kit/migrations"
 	"go-fiber-stater-kit/pkg/core"
 	"log"
 	"time"
@@ -25,6 +29,15 @@ func main() {
 	db := database.ConnectPostgres(cfg)
 	// redisStore := database.NewRedis(cfg)
 	// redisClient := database.NewRedisClient(cfg)
+
+	// Migrate tables
+	migrations.MigrateTableUsers(db)
+
+	// Start workers
+	worker.StartWorkers(db, queue.JobQueue, 5)
+
+	// mock data ทุก 1 วินาที
+	ingest.StartMQTTConsumerMock(1 * time.Second)
 
 	// JWT configuration
 	core.AccessTokenSecret = []byte(cfg.JWTSecret)

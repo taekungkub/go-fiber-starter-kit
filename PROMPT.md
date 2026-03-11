@@ -3,6 +3,7 @@ You are a senior backend engineer.
 Generate a production-ready Go Fiber starter kit using Clean Architecture.
 
 Tech stack:
+
 - Go
 - Fiber
 - PostgreSQL
@@ -17,23 +18,54 @@ Project requirements:
 
 Use a clean architecture structure like:
 
-/cmd
-   main.go
-/config
-/middleware
-/internal
-   /database
-        postgres.go
-        redis.go
-   /api
-       /auth
-       /user
-       /module...
-/pkg
-    /common
-    /core
+.
+├── cmd
+│ └── server
+│ └── main.go
+├── config
+│ ├── config.go
+├── internal
+│ ├── api # http handlers
+│ │ ├── auth
+│ │ │ ├── handler.go
+│ │ │ └── router.go
+│ │ │ └── dto.go
+│ │ │ └── usecase.go
+│ │ │ └── repository.go
+│ │ └── user
+│ │ │ ├── handler.go
+│ │ │ └── router.go
+│ │ │ └── dto.go
+│ │ │ └── usecase.go
+│ │ │ └── repository.go
+│ │
+│ ├── database
+│ │ ├── postgres.go
+│ │ └── redis.go
+│ │
+│ ├── ingest # รับข้อมูลจาก external เช่น MQTT
+│ │ └── mqtt_consumer.go
+│ │
+│ ├── queue
+│ │ └── job_queue.go
+│ │
+│ ├── worker # background worker
+│ │ ├── job.go
+│ │ ├── worker.go
+│ │ └── batch_worker.go
+│ │
+│ │
+├── middleware
+│ ├── auth_middleware.go
+│ └── logger.go
+├── pkg
+│ ├── common
+│ └── core
+│ └── utils.go
+└── go.mod
 
 auth
+
 - handler
 - usecase
 - repository
@@ -41,6 +73,7 @@ auth
 - router
 
 user
+
 - handler
 - usecase
 - repository
@@ -57,6 +90,7 @@ Implement JWT authentication:
 - logout
 
 JWT must include:
+
 - user_id
 - role
 - exp
@@ -64,9 +98,11 @@ JWT must include:
 Token system:
 
 Access Token
+
 - short lived (15 minutes)
 
 Refresh Token
+
 - long lived (7 days)
 
 Security:
@@ -80,6 +116,7 @@ Security:
 Create middleware for:
 
 JWT middleware
+
 - verify token
 - extract user_id
 - extract role
@@ -122,20 +159,20 @@ PostgreSQL schema:
 User table:
 
 model User {
-  id               String
-  email            String
-  username         String
-  password         String
-  firstName        String
-  lastName         String
-  name             String
-  role             UserRole
-  isActive         Boolean
-  refreshTokenHash String?
-  telephone        String?
-  deletedAt        DateTime?
-  createdAt        DateTime
-  updatedAt        DateTime
+id String
+email String
+username String
+password String
+firstName String
+lastName String
+name String
+role UserRole
+isActive Boolean
+refreshTokenHash String?
+telephone String?
+deletedAt DateTime?
+createdAt DateTime
+updatedAt DateTime
 }
 
 UserRole enum:
@@ -159,9 +196,9 @@ CUSTOMER
 Login response:
 
 {
-  "accessToken": "",
-  "refreshToken": "",
-  "user": {}
+"accessToken": "",
+"refreshToken": "",
+"user": {}
 }
 
 10. Implement

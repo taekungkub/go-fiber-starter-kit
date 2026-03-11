@@ -10,7 +10,6 @@ import (
 )
 
 func ConnectPostgres(cfg *config.Config) *sqlx.DB {
-	fmt.Println("DBHost", cfg.DBHost)
 
 	dsn := fmt.Sprintf(
 		"host=%s port=%s user=%s password=%s dbname=%s sslmode=disable",
