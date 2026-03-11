@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"github.com/google/uuid"
 	"github.com/jmoiron/sqlx"
 )
 
@@ -23,18 +24,20 @@ func NewRepository(db *sqlx.DB) Repository {
 
 func (r *repository) CreateUser(dto *RegisterDTO, hashedPassword string) (*UserModel, error) {
 	var user UserModel
+	id := uuid.New().String()
 	query := `
-		INSERT INTO users (email, username, password, first_name, last_name, telephone, role)
-		VALUES ($1, $2, $3, $4, $5, $6, 'CUSTOMER')
+		INSERT INTO users (id, email, username, password, first_name, last_name, telephone, role)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, 'ADMIN')
 		RETURNING id, email, username, password, first_name, last_name, name, role, is_active, 
 		          refresh_token_hash, telephone, deleted_at, created_at, updated_at
 	`
 	err := r.DB.QueryRowx(query,
-		dto.Email, dto.Username, hashedPassword,
+		id, dto.Email, dto.Username, hashedPassword,
 		dto.FirstName, dto.LastName, dto.Telephone,
 	).StructScan(&user)
 
 	if err != nil {
+		println("err:", err.Error())
 		return nil, err
 	}
 	return &user, nil

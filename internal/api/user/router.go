@@ -4,11 +4,10 @@ import (
 	"go-fiber-stater-kit/middleware"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 )
 
-func UserRouter(app fiber.Router, handler Handler, redisClient *redis.Client) {
-	users := app.Group("/users", middleware.JWTMiddleware(redisClient))
+func UserRouter(app fiber.Router, handler Handler) {
+	users := app.Group("/users", middleware.JWTMiddleware())
 
 	users.Get("/", handler.GetAll)
 	users.Get("/:id", handler.GetByID)

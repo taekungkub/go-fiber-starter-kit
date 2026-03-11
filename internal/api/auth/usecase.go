@@ -1,13 +1,10 @@
 package auth
 
 import (
-	"context"
 	"errors"
+	"fmt"
 	"go-fiber-stater-kit/pkg/common"
 	"go-fiber-stater-kit/pkg/core"
-	"time"
-
-	"github.com/redis/go-redis/v9"
 )
 
 type UseCase interface {
@@ -18,14 +15,14 @@ type UseCase interface {
 }
 
 type useCase struct {
-	Repo        Repository
-	RedisClient *redis.Client
+	Repo Repository
+	// RedisClient *redis.Client
 }
 
-func NewUseCase(repo Repository, redisClient *redis.Client) UseCase {
+func NewUseCase(repo Repository) UseCase {
 	return &useCase{
-		Repo:        repo,
-		RedisClient: redisClient,
+		Repo: repo,
+		// RedisClient: redisClient,
 	}
 }
 
@@ -83,7 +80,7 @@ func (u *useCase) Login(dto *LoginDTO) (*AuthResponse, error) {
 		// Fallback: try finding by email
 		user, err = u.Repo.FindByEmail(dto.Username)
 		if err != nil {
-			return nil, errors.New("invalid credentials")
+			return nil, errors.New("username or password is incorrect")
 		}
 	}
 
@@ -94,7 +91,7 @@ func (u *useCase) Login(dto *LoginDTO) (*AuthResponse, error) {
 
 	// Compare passwords
 	if !common.ComparePasswords(user.Password, dto.Password) {
-		return nil, errors.New("invalid credentials")
+		return nil, errors.New("username or password is incorrect")
 	}
 
 	// Generate token pair
@@ -103,8 +100,11 @@ func (u *useCase) Login(dto *LoginDTO) (*AuthResponse, error) {
 		return nil, errors.New("failed to generate tokens")
 	}
 
+	fmt.Println(len(refreshToken))
+
 	// Hash and store refresh token
-	refreshHash, err := common.HashPassword(refreshToken)
+	refreshHash, err := common.HashToken(refreshToken)
+
 	if err != nil {
 		return nil, errors.New("failed to hash refresh token")
 	}
@@ -113,8 +113,8 @@ func (u *useCase) Login(dto *LoginDTO) (*AuthResponse, error) {
 	}
 
 	// Cache user data in Redis
-	ctx := context.Background()
-	u.RedisClient.Set(ctx, "user:"+user.ID, user.Email, 15*time.Minute)
+	// ctx := context.Background()
+	// u.RedisClient.Set(ctx, "user:"+user.ID, user.Email, 15*time.Minute)
 
 	return &AuthResponse{
 		AccessToken:  accessToken,
@@ -137,8 +137,8 @@ func (u *useCase) RefreshToken(dto *RefreshTokenDTO) (*AuthResponse, error) {
 	}
 
 	// Verify the refresh token matches the stored hash
-	if !common.ComparePasswords(*storedHash, dto.RefreshToken) {
-		return nil, errors.New("refresh token mismatch")
+	if hash, err := common.HashToken(dto.RefreshToken); err == nil && hash != *storedHash {
+		return nil, errors.New("invalid refresh token")
 	}
 
 	// Find the user to get latest data
@@ -175,8 +175,8 @@ func (u *useCase) RefreshToken(dto *RefreshTokenDTO) (*AuthResponse, error) {
 
 func (u *useCase) Logout(userID string, accessToken string) error {
 	// Blacklist the access token in Redis (expire when token expires)
-	ctx := context.Background()
-	u.RedisClient.Set(ctx, "blacklist:"+accessToken, "1", core.AccessTokenExpiry)
+	// ctx := context.Background()
+	// u.RedisClient.Set(ctx, "blacklist:"+accessToken, "1", core.AccessTokenExpiry)
 
 	// Clear refresh token hash from database
 	return u.Repo.ClearRefreshTokenHash(userID)

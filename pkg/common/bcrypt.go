@@ -1,7 +1,10 @@
 package common
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -20,4 +23,9 @@ func ComparePasswords(hashedPwd string, plainPwd string) bool {
 		return false
 	}
 	return true
+}
+
+func HashToken(token string) (string, error) {
+	hash := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(hash[:]), nil
 }

@@ -1,14 +1,9 @@
 package user
 
 import (
-	"context"
-	"encoding/json"
 	"errors"
 	"go-fiber-stater-kit/pkg/common"
 	"go-fiber-stater-kit/pkg/core"
-	"time"
-
-	"github.com/redis/go-redis/v9"
 )
 
 type UseCase interface {
@@ -20,14 +15,14 @@ type UseCase interface {
 }
 
 type useCase struct {
-	Repo        Repository
-	RedisClient *redis.Client
+	Repo Repository
+	// RedisClient *redis.Client
 }
 
-func NewUseCase(repo Repository, redisClient *redis.Client) UseCase {
+func NewUseCase(repo Repository) UseCase {
 	return &useCase{
-		Repo:        repo,
-		RedisClient: redisClient,
+		Repo: repo,
+		// RedisClient: redisClient,
 	}
 }
 
@@ -77,14 +72,14 @@ func (u *useCase) FindAll(page, limit int64, sort, order string) (*core.Paging, 
 
 func (u *useCase) FindByID(id string) (*UserResponse, error) {
 	// Try cache first
-	ctx := context.Background()
-	cached, err := u.RedisClient.Get(ctx, "user:detail:"+id).Result()
-	if err == nil {
-		var resp UserResponse
-		if json.Unmarshal([]byte(cached), &resp) == nil {
-			return &resp, nil
-		}
-	}
+	// ctx := context.Background()
+	// cached, err := u.RedisClient.Get(ctx, "user:detail:"+id).Result()
+	// if err == nil {
+	// 	var resp UserResponse
+	// 	if json.Unmarshal([]byte(cached), &resp) == nil {
+	// 		return &resp, nil
+	// 	}
+	// }
 
 	user, err := u.Repo.FindByID(id)
 	if err != nil {
@@ -94,9 +89,9 @@ func (u *useCase) FindByID(id string) (*UserResponse, error) {
 	resp := user.ToResponse()
 
 	// Cache the result
-	if data, err := json.Marshal(resp); err == nil {
-		u.RedisClient.Set(ctx, "user:detail:"+id, data, 10*time.Minute)
-	}
+	// if data, err := json.Marshal(resp); err == nil {
+	// 	u.RedisClient.Set(ctx, "user:detail:"+id, data, 10*time.Minute)
+	// }
 
 	return &resp, nil
 }
@@ -123,8 +118,8 @@ func (u *useCase) Update(id string, dto *UpdateUserDTO) (*UserResponse, error) {
 	}
 
 	// Invalidate cache
-	ctx := context.Background()
-	u.RedisClient.Del(ctx, "user:detail:"+id)
+	// ctx := context.Background()
+	// u.RedisClient.Del(ctx, "user:detail:"+id)
 
 	resp := user.ToResponse()
 	return &resp, nil
@@ -136,8 +131,8 @@ func (u *useCase) Delete(id string) error {
 	}
 
 	// Invalidate cache
-	ctx := context.Background()
-	u.RedisClient.Del(ctx, "user:detail:"+id)
+	// ctx := context.Background()
+	// u.RedisClient.Del(ctx, "user:detail:"+id)
 
 	return nil
 }

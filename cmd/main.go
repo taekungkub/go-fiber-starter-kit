@@ -23,8 +23,8 @@ func main() {
 
 	// Database connections
 	db := database.ConnectPostgres(cfg)
-	redisStore := database.NewRedis(cfg)
-	redisClient := database.NewRedisClient(cfg)
+	// redisStore := database.NewRedis(cfg)
+	// redisClient := database.NewRedisClient(cfg)
 
 	// JWT configuration
 	core.AccessTokenSecret = []byte(cfg.JWTSecret)
@@ -49,7 +49,7 @@ func main() {
 	app.Use(limiter.New(limiter.Config{
 		Max:        100,
 		Expiration: 1 * time.Minute,
-		Storage:    redisStore,
+		// Storage:    redisStore,
 	}))
 
 	// Welcom
@@ -71,15 +71,15 @@ func main() {
 
 	// Auth module
 	authRepo := auth.NewRepository(db)
-	authUseCase := auth.NewUseCase(authRepo, redisClient)
+	authUseCase := auth.NewUseCase(authRepo)
 	authHandler := auth.NewHandler(authUseCase)
-	auth.AuthRouter(api, authHandler, redisClient)
+	auth.AuthRouter(api, authHandler)
 
 	// User module
 	userRepo := user.NewRepository(db)
-	userUseCase := user.NewUseCase(userRepo, redisClient)
+	userUseCase := user.NewUseCase(userRepo)
 	userHandler := user.NewHandler(userUseCase)
-	user.UserRouter(api, userHandler, redisClient)
+	user.UserRouter(api, userHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }

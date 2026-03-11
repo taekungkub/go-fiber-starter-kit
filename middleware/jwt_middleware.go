@@ -1,16 +1,14 @@
 package middleware
 
 import (
-	"context"
 	"go-fiber-stater-kit/pkg/core"
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/redis/go-redis/v9"
 )
 
 // JWTMiddleware validates JWT access tokens, checks Redis blacklist, and attaches user info to context
-func JWTMiddleware(redisClient *redis.Client) fiber.Handler {
+func JWTMiddleware() fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		// Get Authorization header
 		authHeader := c.Get("Authorization")
@@ -27,11 +25,11 @@ func JWTMiddleware(redisClient *redis.Client) fiber.Handler {
 		tokenString := parts[1]
 
 		// Check if token is blacklisted in Redis
-		ctx := context.Background()
-		blacklisted, err := redisClient.Get(ctx, "blacklist:"+tokenString).Result()
-		if err == nil && blacklisted == "1" {
-			return core.SendError(c, fiber.StatusUnauthorized, "Token has been revoked")
-		}
+		// ctx := context.Background()
+		// blacklisted, err := redisClient.Get(ctx, "blacklist:"+tokenString).Result()
+		// if err == nil && blacklisted == "1" {
+		// 	return core.SendError(c, fiber.StatusUnauthorized, "Token has been revoked")
+		// }
 
 		// Validate token
 		claims, err := core.ValidateAccessToken(tokenString)
