@@ -85,7 +85,7 @@ func main() {
 	userHandler := user.NewHandler(userUseCase)
 	user.UserRouter(api, userHandler)
 
-	// Bot module
+	// Ask module
 	askRepo := ask.NewRepository(client)
 	askUseCase := ask.NewUseCase(askRepo)
 	askHandler := ask.NewHandler(askUseCase)
