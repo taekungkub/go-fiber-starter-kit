@@ -17,14 +17,16 @@ type Config struct {
 	DBPass string `envconfig:"DB_PASS"`
 	DBName string `envconfig:"DB_NAME"`
 
-	JWTSecret                  string `envconfig:"JWT_SECRET" default:"your-secret-key-change-this-in-production"`
-	JWTExpiresInAccessToken    int    `envconfig:"JWT_EXPIRES_IN_ACCESS_TOKEN" default:"15"`     // minutes
-	JWTExpiresInRefreshToken   int    `envconfig:"JWT_EXPIRES_IN_REFRESH_TOKEN" default:"10080"` // minutes (7 days)
-	RefreshSecret              string `envconfig:"REFRESH_SECRET" default:"your-refresh-secret-key-change-this-in-production"`
+	JWTSecret                string `envconfig:"JWT_SECRET" default:"your-secret-key-change-this-in-production"`
+	JWTExpiresInAccessToken  int    `envconfig:"JWT_EXPIRES_IN_ACCESS_TOKEN" default:"15"`     // minutes
+	JWTExpiresInRefreshToken int    `envconfig:"JWT_EXPIRES_IN_REFRESH_TOKEN" default:"10080"` // minutes (7 days)
+	RefreshSecret            string `envconfig:"REFRESH_SECRET" default:"your-refresh-secret-key-change-this-in-production"`
 
 	RedisHost     string `envconfig:"REDIS_HOST" default:"localhost"`
 	RedisPort     int    `envconfig:"REDIS_PORT" default:"6379"`
 	RedisPassword string `envconfig:"REDIS_PASSWORD"`
+
+	OpenAIKey string `envconfig:"OPENAI_KEY"`
 }
 
 func LoadConfig() *Config {

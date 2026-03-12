@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"go-fiber-stater-kit/config"
+	"go-fiber-stater-kit/internal/api/ask"
 	"go-fiber-stater-kit/internal/api/auth"
 	"go-fiber-stater-kit/internal/api/user"
 	"go-fiber-stater-kit/internal/database"
@@ -14,6 +15,7 @@ import (
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/sashabaranov/go-openai"
 )
 
 func main() {
@@ -31,6 +33,8 @@ func main() {
 	core.RefreshTokenSecret = []byte(cfg.RefreshSecret)
 	core.AccessTokenExpiry = time.Duration(cfg.JWTExpiresInAccessToken) * time.Minute
 	core.RefreshTokenExpiry = time.Duration(cfg.JWTExpiresInRefreshToken) * time.Minute
+
+	client := openai.NewClient(cfg.OpenAIKey)
 
 	// Fiber app
 	app := fiber.New(fiber.Config{
@@ -80,6 +84,12 @@ func main() {
 	userUseCase := user.NewUseCase(userRepo)
 	userHandler := user.NewHandler(userUseCase)
 	user.UserRouter(api, userHandler)
+
+	// Bot module
+	askRepo := ask.NewRepository(client)
+	askUseCase := ask.NewUseCase(askRepo)
+	askHandler := ask.NewHandler(askUseCase)
+	ask.AskRouter(api, askHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }
