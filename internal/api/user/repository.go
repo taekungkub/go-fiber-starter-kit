@@ -89,6 +89,7 @@ func (r *repository) Create(dto *CreateUserDTO, hashedPassword string) (*User, e
 }
 
 func (r *repository) Update(id string, dto *UpdateUserDTO) (*User, error) {
+
 	setClauses := []string{}
 	args := []interface{}{}
 	argIdx := 1

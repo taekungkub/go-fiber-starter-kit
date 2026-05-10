@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-fiber-stater-kit/config"
 	"go-fiber-stater-kit/internal/api/auth"
+	"go-fiber-stater-kit/internal/api/role"
 	"go-fiber-stater-kit/internal/api/user"
 	"go-fiber-stater-kit/internal/database"
 	"go-fiber-stater-kit/pkg/core"
@@ -80,6 +81,12 @@ func main() {
 	userUseCase := user.NewUseCase(userRepo)
 	userHandler := user.NewHandler(userUseCase)
 	user.UserRouter(api, userHandler)
+
+	// Role module
+	roleRepo := role.NewRepository(db)
+	roleUseCase := role.NewUseCase(roleRepo)
+	roleHandler := role.NewHandler(roleUseCase)
+	role.RoleRouter(api, roleHandler)
 
 	log.Fatal(app.Listen(":8080"))
 }

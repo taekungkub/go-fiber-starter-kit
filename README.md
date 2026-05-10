@@ -1,4 +1,20 @@
-Set-Content -Path "README.md" -Value @'
+### Run
+
+```
+go run ./cmd
+```
+
+### Run with air (auto-reload)
+
+```
+air
+```
+
+### Build
+
+```
+go build -o app ./cmd
+```
 
 # Go Fiber Starter Kit
 
