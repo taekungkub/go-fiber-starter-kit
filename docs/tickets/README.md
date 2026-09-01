@@ -17,6 +17,7 @@ tracer-bullet tickets แตกจาก design docs — เรียงตา�
 - [ ] **10** · [Daily + monthly rollup](./10-rollup-daily-monthly.md) — _blocked by: 09_
 - [ ] **11** · [/telemetry/aggregate API](./11-telemetry-aggregate-api.md) — _blocked by: 10_
 - [ ] **12** · [Retention: partition + 90-day drop](./12-retention-partition-90day-drop.md) — _blocked by: 06_
+- [ ] **14** · [ตัดสิน + รองรับ metric ที่ไม่ใช่ตัวเลข (value_text)](./14-non-numeric-metric-value-text.md) — _blocked by: 06, needs-decision_
 
 ## เส้นทาง
 
@@ -31,4 +32,4 @@ tracer-bullet tickets แตกจาก design docs — เรียงตา�
 
 ## ยังไม่อยู่ในชุดนี้ (open question)
 
-real-time push (WebSocket/SSE), multi-tenant row-level access, `value_text` สำหรับ metric ที่ไม่ใช่ตัวเลข, `/dashboard/summary` — ดู [architecture.md §4](../architecture.md)
+real-time push (WebSocket/SSE), multi-tenant row-level access, `/dashboard/summary` — ดู [architecture.md §4](../architecture.md). `value_text` สำหรับ metric ที่ไม่ใช่ตัวเลขมี ticket แล้ว (14) แต่ยัง needs-decision
