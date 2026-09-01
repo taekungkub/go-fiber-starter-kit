@@ -9,6 +9,7 @@
 อ้างอิง: [data-model.md §3](../data-model.md), [implementation-plan.md Phase 1](../implementation-plan.md)
 
 - [ ] migration สร้าง `telemetry_raw` (long: device_id/metric/value/recorded_at/ingested_at) เป็น partitioned table (PK รวม `recorded_at`), index `(device_id, metric, recorded_at)`
+- [ ] สร้าง partition **เดือนปัจจุบัน + DEFAULT partition** พร้อมตอน migrate — ต้องมี partition รองรับ**ก่อน**เริ่ม ingest ไม่งั้น insert แรกจะ hard-fail (job pre-create/drop เต็มรูปแบบอยู่ [ticket 12](./12-retention-partition-90day-drop.md))
 - [ ] `worker.Job` เก็บ metric rows ที่ parse แล้ว (fan-out) ไม่ใช่ `[]byte` ดิบ
 - [ ] worker ทำ bulk insert จริง + flush ตาม batch size **และ** timer (ไม่ค้างเมื่อ throughput ต่ำ)
 - [ ] batch size / flush interval เป็น config

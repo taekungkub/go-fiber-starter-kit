@@ -60,7 +60,7 @@ Index: unique `(device_id)`, index `(site_id)`, index `(device_template)`
 | column          | type         | note                                                      |
 | --------------- | ------------ | --------------------------------------------------------- |
 | id              | BIGSERIAL PK |                                                           |
-| device_id       | VARCHAR(100) | soft ref → `devices.device_id` (ไม่บังคับ FK constraint เพื่อ insert เร็ว) |
+| device_id       | VARCHAR(100) | soft ref → `devices.device_id` (**ไม่บังคับ FK constraint** เพื่อ insert เร็ว — integrity ย้ายไปกันที่ ingest layer: validate device_id กับ cache ก่อน enqueue, ดู [ticket 07](./tickets/07-mqtt-ingestion-bridge.md)) |
 | device_template | VARCHAR(50)  | denormalize ไว้เพื่อ filter/agg ต่อชนิดโดยไม่ต้อง join (optional แต่แนะนำ) |
 | metric          | VARCHAR(50)  | เช่น `voltage`, `power`, `flow` — ต้องตรงกับ key ใน template |
 | value           | NUMERIC      | ค่าที่วัดได้                                              |
@@ -138,6 +138,8 @@ WHERE template_key = 'power_meter';
 
 **policy สำหรับ key ที่ยังไม่อยู่ใน template** (แนะนำ strict): ingest เจอ key ที่ไม่มีในนิยาม → **log แล้วข้าม** ไม่ auto-insert (กันข้อมูลขยะจากพิมพ์ key ผิด) อยากรับจริงให้เพิ่มใน registry ก่อน
 
+> ⚠️ **strict = ข้อมูลหายเงียบ:** การ "log แล้วข้าม" ทำให้ data loss มองไม่เห็นถ้าไม่มี metric/alert — ต้องนับ drop **แยกตามสาเหตุ** (unknown device / unknown metric / parse error) ให้เห็น rate ไม่งั้นจะไม่รู้ว่าเสีย metric ไปกี่ device กี่วัน ดู [ticket 07](./tickets/07-mqtt-ingestion-bridge.md)
+
 > เทียบกับ wide (แบบ A ที่ไม่ได้เลือก): metric ใหม่ = `ALTER TABLE ADD COLUMN` ทุกตาราง (raw + hourly + daily + monthly) + แก้ struct/query ทุกจุด
 
 ## 5. Retention & partition (เฉพาะ `telemetry_raw`)
@@ -151,7 +153,8 @@ WHERE template_key = 'power_meter';
 
 หมายเหตุ partition ของ `telemetry_raw`:
 - partitioned table ต้องมี partition key อยู่ใน PK → PK = `(id, recorded_at)`
-- การสร้าง partition รายเดือนล่วงหน้าต้องมี job แยก — ใส่ไว้ Phase 5 (hardening) ของ [implementation-plan.md](./implementation-plan.md)
+- ⚠️ **insert ที่ตกในช่วงที่ยังไม่มี partition = hard fail ทันที** (ไม่ตกลง table เปล่า) — พลาดสร้าง partition เดือนถัดไป = ingest หยุดเขียนตอนเที่ยงคืนวันที่ 1 กันด้วย 2 ชั้น: **(1) pre-create เดือนปัจจุบัน+ถัดไป** (รันตอน startup + เป็นรอบ) **(2) DEFAULT partition** เป็น catch-all + alert ถ้ามี row ตกลง default จริง
+- partition เดือนปัจจุบัน + DEFAULT ต้องมีตั้งแต่ตอน migrate ([ticket 06](./tickets/06-telemetry-raw-and-worker-batch-write.md)) — job pre-create/drop เต็มรูปแบบอยู่ [ticket 12](./tickets/12-retention-partition-90day-drop.md) (Phase 5 hardening ของ [implementation-plan.md](./implementation-plan.md))
 - ค่าจริงของ retention ยืนยันกับ product (ผูกกับ open question ใน [architecture.md](./architecture.md#4-สิ่งที่ยังต้องตัดสินใจ-open-questions))
 - ทางเลือกที่ตรงงานนี้สุดถ้าไม่อยากดูแลเอง: **TimescaleDB** (hypertable + continuous aggregates จัดการ rollup ทุก interval + retention อัตโนมัติ ไม่ต้องมีตาราง agg เอง) — upgrade path ไม่ใช่เฟสแรก
 

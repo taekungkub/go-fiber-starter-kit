@@ -7,6 +7,7 @@ tracer-bullet tickets แตกจาก design docs — เรียงตา�
 - [ ] **01** · [Fix register role + user-update authz](./01-fix-register-role-and-user-update-authz.md) — _blocked by: none_
 - [ ] **02** · [Refresh-token hash + sort whitelist](./02-refresh-token-hash-and-sort-whitelist.md) — _blocked by: none_
 - [ ] **13** · [Logout token revocation + Redis wiring](./13-logout-token-revocation-redis.md) — _blocked by: none_
+- [ ] **15** · [Migration fail-fast + ordered runner](./15-migration-fail-fast-runner.md) — _blocked by: none (ทำก่อน 04–06)_
 - [ ] **03** · [Permission layer + RequirePermission](./03-permission-layer-require-permission.md) — _blocked by: 01_
 - [ ] **04** · [device_templates: schema + CRUD + seed](./04-device-templates-schema-crud-seed.md) — _blocked by: 03_
 - [ ] **05** · [devices: schema + CRUD](./05-devices-schema-crud.md) — _blocked by: 04_
@@ -25,10 +26,11 @@ tracer-bullet tickets แตกจาก design docs — เรียงตา�
 01 ─▶ 03 ─▶ 04 ─▶ 05 ─▶ 06 ─┬─▶ 07  (bridge, +04)
 02 (อิสระ)                   ├─▶ 08  (read API)
 13 (อิสระ)                   ├─▶ 09 ─▶ 10 ─▶ 11  (aggregate)
-                             └─▶ 12  (retention)
+15 (อิสระ, ทำก่อน 06)         ├─▶ 12  (retention)
+                             └─▶ 14  (value_text, needs-decision)
 ```
 
-เริ่มได้ทันที (ไม่มี blocker): **01 / 02 / 13** — หลัง **06** เดินขนานได้: 07 / 08 / 09 / 12
+เริ่มได้ทันที (ไม่มี blocker): **01 / 02 / 13 / 15** (15 ควรทำก่อน 04–06 เพราะทุกตารางใหม่พึ่ง migration runner) — หลัง **06** เดินขนานได้: 07 / 08 / 09 / 12
 
 ## ยังไม่อยู่ในชุดนี้ (open question)
 
